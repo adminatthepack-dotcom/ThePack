@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ROLE_LABELS, ROLE_BADGE_CLASSES } from "@/lib/roles";
+import { ROLE_LABELS, ROLE_BADGE_CLASSES, type Role } from "@/lib/roles";
 import { approveInstructor, denyInstructor } from "./actions";
 
 export default async function AdminInstructorsPage() {
@@ -54,8 +54,8 @@ export default async function AdminInstructorsPage() {
                     >
                       {p.full_name ?? "Unknown"}
                     </Link>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${ROLE_BADGE_CLASSES[p.role]}`}>
-                      {ROLE_LABELS[p.role]}
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${ROLE_BADGE_CLASSES[p.role as Role]}`}>
+                      {ROLE_LABELS[p.role as Role]}
                     </span>
                   </div>
                   <p className="text-xs text-pack-brown">{p.contact_email}</p>
@@ -100,8 +100,8 @@ export default async function AdminInstructorsPage() {
                     <Link href={`/profile/${p.id}`} className="font-medium text-pack-mask hover:underline">
                       {p.full_name ?? "Unknown"}
                     </Link>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${ROLE_BADGE_CLASSES[p.role]}`}>
-                      {ROLE_LABELS[p.role]}
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${ROLE_BADGE_CLASSES[p.role as Role]}`}>
+                      {ROLE_LABELS[p.role as Role]}
                     </span>
                   </div>
                   <p className="text-xs text-pack-brown">{p.contact_email}</p>
