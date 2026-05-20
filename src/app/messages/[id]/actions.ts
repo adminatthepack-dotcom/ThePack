@@ -69,7 +69,7 @@ export async function sendMessage(formData: FormData) {
       p_link: `/messages/${user.id}`,
     });
 
-    if (recipient.contact_email) {
+    if (recipient?.contact_email) {
       await sendMessageNotification({
         to: recipient.contact_email,
         senderName,
