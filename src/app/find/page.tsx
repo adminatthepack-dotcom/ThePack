@@ -375,7 +375,10 @@ async function InstructorResults({ who }: { who: string }) {
           <ul className="space-y-3">
             {filtered.map(({ profile: p, distance: d }) => (
               <li key={p.id}>
-                <ProfileCard profile={p} distanceMiles={d} />
+                <ProfileCard profile={p} />
+                {d !== null && (
+                  <p className="mt-1 px-1 text-xs text-pack-brown">{d.toFixed(0)} miles away</p>
+                )}
               </li>
             ))}
           </ul>
