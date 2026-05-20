@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fbf6ee;
+  --foreground: #1c1308;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* THE PACK — Malinois-inspired palette */
+  --color-pack-cream: #fbf6ee;
+  --color-pack-sand: #f0e2c5;
+  --color-pack-tan: #c89253;
+  --color-pack-fawn: #a87340;
+  --color-pack-brown: #5a3a1c;
+  --color-pack-mask: #1c0f06;
+  --color-pack-blue: #2563eb;
+  --color-pack-blue-soft: #60a5fa;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Animated Malinois logo — ears twitch on a gentle loop */
+@keyframes logo-ear-l {
+  0%, 88%, 100% { transform: rotate(0deg); }
+  93% { transform: rotate(-14deg); }
+}
+@keyframes logo-ear-r {
+  0%, 86%, 100% { transform: rotate(0deg); }
+  91% { transform: rotate(14deg); }
+}
+.logo-ear-l {
+  transform-origin: 24px 13px;
+  animation: logo-ear-l 5s ease-in-out infinite;
+}
+.logo-ear-r {
+  transform-origin: 44px 13px;
+  animation: logo-ear-r 5s 2.3s ease-in-out infinite;
+}
