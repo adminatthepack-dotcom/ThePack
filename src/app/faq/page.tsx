@@ -4,7 +4,7 @@ export const metadata = {
 
 const FAQS = [
   {
-    q: "How do you evaluate and verify providers on the platform?",
+    q: "How do we evaluate and verify providers on the platform?",
     a: `Every provider application is manually reviewed by our team before approval. We examine the credentials and documentation submitted with each application — this includes professional certifications (e.g., NAPWDA, USPCA, AKC titles), state or federal licenses, business registrations, and, where applicable, proof of K9 ownership and partnership.
 
 We cross-reference submitted credentials against the issuing agencies where possible and may follow up directly with applicants for clarification. Applications that cannot be verified or that do not meet our standards are declined, with a reason provided. Our goal is to ensure that every approved provider on The Pack represents a legitimate, qualified professional in the working-dog community.`,
@@ -27,7 +27,7 @@ You are welcome to reapply after addressing the issue — simply start a new app
   },
   {
     q: "Is my submitted documentation kept secure?",
-    a: `Yes. Documents uploaded during the application process are stored in a private, access-controlled storage bucket and are only accessible to our administrative team for review purposes. They are never displayed publicly on your profile. Once your application is decided, you can upload relevant certifications and licenses directly to your public profile through the standard document manager.`,
+    a: `Yes. Documents uploaded during the application process are stored in a private, access-controlled storage bucket and are only accessible to our administrative team for review purposes. Once your application is approved, you can upload any certifications and licenses you want the public to see directly to your profile through the standard document manager — you decide what is visible and what stays private.`,
   },
   {
     q: "Can I update my profile after I'm approved?",

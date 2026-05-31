@@ -27,7 +27,7 @@ function isPublicPath(pathname: string) {
   );
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
   const code = searchParams.get("code");
   if (code && pathname === "/") {
