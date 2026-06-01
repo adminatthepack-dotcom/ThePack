@@ -36,13 +36,14 @@ export const TAGS_BY_ROLE: Record<Role, TagDef[]> = {
     { value: "imported", label: "Imported bloodlines" },
   ],
   employer: [
-    { value: "hiring-handlers", label: "Hiring handlers" },
-    { value: "hiring-trainers", label: "Hiring trainers" },
-    { value: "executive-protection", label: "Executive protection" },
-    { value: "security", label: "Security services" },
+    { value: "detection-company", label: "Detection company" },
+    { value: "law-enforcement", label: "Law enforcement agency" },
+    { value: "government-agency", label: "Government / federal agency" },
     { value: "training-academy", label: "Training academy" },
-    { value: "law-enforcement", label: "Law enforcement" },
-    { value: "military", label: "Military" },
+    { value: "sar-organization", label: "Search & rescue organization" },
+    { value: "sport-club", label: "Sporting / competition club" },
+    { value: "private-security", label: "Private security firm" },
+    { value: "nonprofit", label: "Nonprofit / advocacy" },
   ],
   customer: [
     { value: "want-protection-dog", label: "Looking: protection dog" },
@@ -64,6 +65,7 @@ export const TAGS_BY_ROLE: Record<Role, TagDef[]> = {
     { value: "trainer-behavior", label: "Behavior modification" },
     { value: "trainer-private", label: "Private lessons" },
     { value: "trainer-group", label: "Group classes" },
+    { value: "trainer-board-train", label: "Board & train programs" },
   ],
   veterinarian: [
     { value: "vet-working-dog", label: "Working dog medicine" },
@@ -87,15 +89,29 @@ export const TAGS_BY_ROLE: Record<Role, TagDef[]> = {
     { value: "cert-international", label: "International scope" },
   ],
   transporter: [
+    // Transport method
     { value: "trans-ground", label: "Ground transport" },
-    { value: "trans-air", label: "Air / pet cargo arrangements" },
+    { value: "trans-air-cargo", label: "Air cargo coordination" },
+    { value: "trans-nanny-flight", label: "Nanny / escort flights (flies with dog)" },
+    // Route
+    { value: "trans-local", label: "Local / regional" },
+    { value: "trans-cross-country", label: "Cross-country" },
+    { value: "trans-international", label: "International (import/export)" },
+    // What they transport
+    { value: "trans-working-dogs", label: "Working / detection dogs" },
+    { value: "trans-puppies", label: "Puppies & litters" },
+    { value: "trans-all-dogs", label: "All breeds & ages" },
+    // Boarding / holding
+    { value: "trans-no-boarding", label: "Point-to-point only (no boarding)" },
+    { value: "trans-pre-transport", label: "Pre-transport holding" },
+    { value: "trans-post-transport", label: "Post-transport holding" },
+    { value: "trans-layover-care", label: "Layover / overnight care" },
+    { value: "trans-extended-boarding", label: "Extended boarding (days / weeks)" },
+    // Vehicle / credentials
     { value: "trans-climate", label: "Climate-controlled vehicle" },
-    { value: "trans-international", label: "International transport" },
-    { value: "trans-cross-country", label: "Cross-country routes" },
-    { value: "trans-local", label: "Local / regional routes" },
-    { value: "trans-overnight", label: "Overnight stays" },
-    { value: "trans-litter", label: "Puppy / litter transport" },
-    { value: "trans-working", label: "Working-dog specialty" },
+    { value: "trans-gps", label: "GPS-tracked vehicle" },
+    { value: "trans-usda-licensed", label: "USDA Licensed (Class T)" },
+    { value: "trans-ipata-member", label: "IPATA Member" },
     { value: "trans-insured", label: "Fully insured" },
   ],
 };
