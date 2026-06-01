@@ -25,7 +25,8 @@ import { expandStandardFinds } from "@/lib/detection";
 
 type SP = {
   intent?: string;
-  who?: string;  // "myself" | "dog" | "team" — only for get-training
+  who?: string;      // "myself" | "dog" | "team" — only for get-training
+  facility?: string; // "vet" | "kennel" — only for board-dog
   spec?: string;
   finds?: string | string[];
   other_find?: string;
@@ -61,6 +62,16 @@ export default async function FindPage({
       return <InstructorResults who={who} />;
     }
     // who === "dog" → fall through to normal trainer flow below
+  }
+
+  // board-dog has an extra "what kind of facility?" step before specs
+  if (intent.value === "board-dog") {
+    const facility = sp.facility;
+    if (!facility) return <StepFacility />;
+    if (facility === "vet") {
+      return <BoardingVetResults />;
+    }
+    // facility === "kennel" → fall through to normal transporter spec flow below
   }
 
   const spec = getSpec(intent, sp.spec);
@@ -389,15 +400,185 @@ async function InstructorResults({ who }: { who: string }) {
 }
 
 // ============================================================
+// StepFacility — "what kind of boarding?" (board-dog intent only)
+// ============================================================
+function StepFacility() {
+  const options = [
+    {
+      value: "vet",
+      label: "Veterinary clinic",
+      hint: "Board with a vet — ideal for working dogs, post-op care, or when you need medical oversight.",
+      emoji: "🏥",
+    },
+    {
+      value: "kennel",
+      label: "Kennel / holding facility",
+      hint: "Transporters and dedicated holding facilities for pre/post-transport stays or extended boarding.",
+      emoji: "🏠",
+    },
+  ];
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <StepHeader
+        step={2}
+        total={4}
+        back="/find"
+        crumbs={[
+          { label: "What you need", href: "/find" },
+          { label: "Board a dog" },
+        ]}
+      />
+      <h1 className="text-3xl font-bold tracking-tight text-pack-mask">
+        What kind of facility?
+      </h1>
+      <p className="mt-2 text-base text-pack-brown">
+        Both options accept working dogs — pick whichever fits your situation.
+      </p>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        {options.map((opt) => (
+          <Link
+            key={opt.value}
+            href={`/find?intent=board-dog&facility=${opt.value}`}
+            className="group flex flex-col gap-2 rounded-lg border border-pack-tan/40 bg-white p-5 transition hover:border-pack-tan hover:shadow-sm"
+          >
+            <span className="text-2xl">{opt.emoji}</span>
+            <span className="font-semibold text-pack-mask">{opt.label}</span>
+            <p className="text-sm text-pack-brown">{opt.hint}</p>
+            <span className="mt-auto self-end text-xl text-pack-mask/40 transition group-hover:translate-x-1 group-hover:text-pack-mask">
+              →
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// BoardingVetResults — vets with vet-boarding tag
+// ============================================================
+async function BoardingVetResults() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: rawProfiles } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("role", "veterinarian")
+    .contains("tags", ["vet-boarding"])
+    .returns<Profile[]>();
+
+  let viewerCoords: { lat: number; lng: number } | null = null;
+  let viewerRadius = 120;
+  if (user) {
+    const { data: me } = await supabase
+      .from("profiles")
+      .select("latitude, longitude, search_radius_miles")
+      .eq("id", user.id)
+      .maybeSingle<{ latitude: number | null; longitude: number | null; search_radius_miles: number | null }>();
+    if (me && typeof me.latitude === "number" && typeof me.longitude === "number") {
+      viewerCoords = { lat: me.latitude, lng: me.longitude };
+    }
+    viewerRadius = me?.search_radius_miles ?? 120;
+  }
+
+  type WithDist = { profile: Profile; distance: number | null };
+  const withDist: WithDist[] = (rawProfiles ?? []).map((p) => {
+    let d: number | null = null;
+    if (viewerCoords && typeof p.latitude === "number" && typeof p.longitude === "number") {
+      d = haversineMiles(viewerCoords.lat, viewerCoords.lng, p.latitude, p.longitude);
+    }
+    return { profile: p, distance: d };
+  });
+
+  const filtered = viewerCoords
+    ? withDist.filter((w) => w.distance === null || w.distance <= viewerRadius)
+    : withDist;
+
+  filtered.sort((a, b) => {
+    if (a.distance === null && b.distance === null) return 0;
+    if (a.distance === null) return 1;
+    if (b.distance === null) return -1;
+    return a.distance - b.distance;
+  });
+
+  return (
+    <div className="mx-auto max-w-3xl">
+      <StepHeader
+        step={3}
+        total={3}
+        back="/find?intent=board-dog"
+        crumbs={[
+          { label: "What you need", href: "/find" },
+          { label: "Board a dog", href: "/find?intent=board-dog" },
+          { label: "Veterinary clinic" },
+        ]}
+      />
+      <h1 className="text-3xl font-bold tracking-tight text-pack-mask">
+        {filtered.length} vet{filtered.length === 1 ? "" : "s"} offering boarding
+      </h1>
+      <p className="mt-1 text-sm text-pack-brown">
+        Veterinary clinics that accept working dogs for boarding or kenneling.
+      </p>
+
+      {!user ? (
+        <div className="mt-4 rounded-md border border-pack-tan/40 bg-pack-sand/30 p-3 text-sm text-pack-brown">
+          <Link href="/login" className="font-medium text-pack-mask underline">Log in</Link>{" "}
+          and add your location to filter by distance.
+        </div>
+      ) : !viewerCoords ? (
+        <div className="mt-4 rounded-md border border-pack-tan/40 bg-pack-sand/30 p-3 text-sm text-pack-brown">
+          Showing all matches.{" "}
+          <Link href="/profile/edit" className="font-medium text-pack-mask underline">Set your coordinates</Link>{" "}
+          to filter within {viewerRadius} miles.
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-pack-brown">
+          Within {viewerRadius} miles, nearest first.{" "}
+          <Link href="/profile/edit" className="text-pack-mask underline">Change radius</Link>
+        </p>
+      )}
+
+      <div className="mt-6">
+        {filtered.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-pack-tan/40 bg-white p-8 text-center text-sm text-pack-brown">
+            No vets offering boarding found{viewerCoords ? ` within ${viewerRadius} miles` : ""}.{" "}
+            <Link href="/directory" className="font-medium text-pack-mask underline">Browse the full directory</Link>.
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {filtered.map(({ profile: p, distance: d }) => (
+              <li key={p.id}>
+                <ProfileCard profile={p} />
+                {d !== null && (
+                  <p className="mt-1 px-1 text-xs text-pack-brown">{d.toFixed(0)} miles away</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // Step 2 — pick a specialization
 // ============================================================
 function Step2({ intent }: { intent: IntentDef }) {
   const willHaveStep3 = intent.specs.some((s) => FIND_DETAILS[s.value]);
   const isTraining = intent.value === "get-training";
+  const isBoarding = intent.value === "board-dog";
   // For get-training the "dog" who-step comes before discipline
-  const backHref = isTraining ? "/find?intent=get-training&who=dog" : "/find";
-  const stepNum = isTraining ? 3 : 2;
-  const totalSteps = isTraining ? 4 : (willHaveStep3 ? 4 : 3);
+  // For board-dog the "kennel" facility-step comes before specs
+  const backHref = isTraining
+    ? "/find?intent=get-training&who=dog"
+    : isBoarding
+    ? "/find?intent=board-dog&facility=kennel"
+    : "/find";
+  const stepNum = (isTraining || isBoarding) ? 3 : 2;
+  const totalSteps = (isTraining || isBoarding) ? 4 : (willHaveStep3 ? 4 : 3);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -410,6 +591,9 @@ function Step2({ intent }: { intent: IntentDef }) {
           ...(isTraining
             ? [{ label: intent.cardTitle, href: "/find?intent=get-training" },
                { label: "For my dog", href: "/find?intent=get-training&who=dog" }]
+            : isBoarding
+            ? [{ label: intent.cardTitle, href: "/find?intent=board-dog" },
+               { label: "Kennel / holding", href: "/find?intent=board-dog&facility=kennel" }]
             : [{ label: intent.cardTitle }]),
         ]}
       />
@@ -420,7 +604,7 @@ function Step2({ intent }: { intent: IntentDef }) {
         {intent.specs.map((spec) => (
           <Link
             key={spec.value}
-            href={`/find?intent=${intent.value}${isTraining ? "&who=dog" : ""}&spec=${spec.value}`}
+            href={`/find?intent=${intent.value}${isTraining ? "&who=dog" : isBoarding ? "&facility=kennel" : ""}&spec=${spec.value}`}
             className="group flex items-center justify-between gap-3 rounded-lg border border-pack-tan/40 bg-white p-4 transition hover:border-pack-tan hover:shadow-sm"
           >
             <span className="font-medium text-pack-mask">{spec.label}</span>

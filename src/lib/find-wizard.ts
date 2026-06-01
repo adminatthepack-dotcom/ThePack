@@ -94,6 +94,7 @@ export const FIND_INTENTS: IntentDef[] = [
       { value: "ortho", label: "Orthopedics", tagFilter: "vet-ortho" },
       { value: "rehab", label: "Rehab & physical therapy", tagFilter: "vet-rehab" },
       { value: "general", label: "General practice", tagFilter: "vet-general" },
+      { value: "boarding", label: "Boarding / kennel services", tagFilter: "vet-boarding" },
       { value: "any", label: "Show all veterinarians" },
     ],
   },

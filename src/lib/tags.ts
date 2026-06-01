@@ -77,6 +77,7 @@ export const TAGS_BY_ROLE: Record<Role, TagDef[]> = {
     { value: "vet-nutrition", label: "Nutrition" },
     { value: "vet-general", label: "General practice" },
     { value: "vet-mobile", label: "Mobile / on-site" },
+    { value: "vet-boarding", label: "Boarding / kennel services" },
   ],
   certification_agency: [
     { value: "cert-detection", label: "Detection certifications" },
